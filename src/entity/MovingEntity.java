@@ -21,7 +21,7 @@ public class MovingEntity extends Entity{
     protected int currentDirection = -1;
     protected int currentFrame = 0;
 
-    /** corners */
+    /** corners ****/
     protected int rightUpX;
     protected int rightUpY;
     protected int leftUpX;
