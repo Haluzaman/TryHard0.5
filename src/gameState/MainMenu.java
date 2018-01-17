@@ -38,12 +38,12 @@ public class MainMenu extends GameState{
      * Main method responsible for drawing on screen
      * */
     public void draw(){
-
-        font.setColor(Color.MAGENTA);
-        screen.renderString("Lubos Game",this.font,100,10,0,20,20);
-        font.setColor(Color.WHITE);
+        screen.setFont(Font.ARIAL_FONT);
+        screen.setFontColor(Color.MAGENTA);
+        screen.renderString("Lubos Game",100,10,0,20,20);
+        screen.setFontColor(Color.WHITE);
         for(int i = 0; i < options.length;i++){
-            screen.renderString(options[i],font,145,40+25*i,0);
+            screen.renderString(options[i],145,40+25*i,0,20,20);
         }
         Graphics.drawFillRectangle(screen,139,46 + currentOption*25,4,4,Color.YELLOW);
         Graphics.drawFillRectangle(screen,225,46 + currentOption*25,4,4,Color.YELLOW);

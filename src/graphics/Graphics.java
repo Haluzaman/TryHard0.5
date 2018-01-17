@@ -154,16 +154,15 @@ public class Graphics {
         if(y+height > screen.getHeight())
             height = screen.getHeight() - y;
 
-        int[] pixels = screen.getPixels();
-
         for(int yy = 1;yy < height;yy++){
-            pixels[ x + (y + yy)*screen.getWidth()] = c.getRGB();
-            pixels[x+(width-1) + (y+yy)*(screen.getWidth())] = c.getRGB();
+            screen.setPixel(x,y+yy,c.getRGB());
+            screen.setPixel(x+width-1,y+yy,c.getRGB());
         }
 
         for(int xx = 0;xx < width;xx++){
-            pixels[x+xx+y*screen.getWidth()] = c.getRGB();
-            pixels[x+xx+(y+height)*screen.getWidth()] = c.getRGB();
+            screen.setPixel(x+xx,y,c.getRGB());
+            screen.setPixel(x+xx,y+height,c.getRGB());
+
         }
     }
 

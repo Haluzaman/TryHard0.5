@@ -5,8 +5,7 @@ import graphics.Screen;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 
@@ -18,7 +17,7 @@ import java.awt.image.DataBufferInt;
  * holds main thread
  * holds main drawing and updateing method
  */
-public class Game extends JPanel implements Runnable,KeyListener{
+public class Game extends JPanel implements Runnable,KeyListener,MouseListener,MouseMotionListener{
 
     public static final int WIDTH = 352;
     public static final int HEIGHT = 192;
@@ -56,6 +55,8 @@ public class Game extends JPanel implements Runnable,KeyListener{
         this.setFocusable(true);
         this.requestFocus();
         addKeyListener(this);
+        addMouseListener(this);
+        addMouseMotionListener(this);
     }
 
     private void initGraphics(){
@@ -165,5 +166,40 @@ public class Game extends JPanel implements Runnable,KeyListener{
 
     public void keyTyped(KeyEvent e){
         gsm.keyReleased(e.getKeyCode());
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        System.out.println("X moouse: " + ((e.getX()/SCALE)>>Game.TILE_BYTE_SIZE) + " Y mouse: " + ((e.getY()/3)>>Game.TILE_BYTE_SIZE));
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        System.out.println("Mouse coordinates: " + ((e.getX()/SCALE)>>Game.TILE_BYTE_SIZE) + " " + ((e.getY()/SCALE)>>Game.TILE_BYTE_SIZE));
     }
 }

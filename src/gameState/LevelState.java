@@ -10,12 +10,15 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import graphics.*;
 
+import static com.oracle.deploy.update.UpdateCheck.UpdateCheckState.IDLE;
+
 /**
  * Created by bubof on 09.07.2017.
  */
 public class LevelState extends GameState {
 
     public final static double GRAVITY = 0.5;
+    //todo: every Tile should have friction...
     public final static double FRICTION = 0.7;
 
     private Map map;
@@ -32,10 +35,7 @@ public class LevelState extends GameState {
     public void draw(){
         screen.renderMap(this.map);
         player.render();
-//        screenX = (int)(rX - screen.getX());
-//        screenY = (int)(rY - screen.getY());
-          Graphics.drawRectangle(screen,player.getScreenX(),player.getScreenY(),player.getCollisionWidth(),player.getCollisionHeight(),Color.YELLOW);
-//        screen.drawLine(50,50,70,25, Color.black);
+        Graphics.drawRectangle(screen,player.getScreenX(),player.getScreenY(),player.getCollisionWidth(),player.getCollisionHeight(),Color.YELLOW);
     }
 
     public void update(double delta){
@@ -44,40 +44,43 @@ public class LevelState extends GameState {
         screen.center(player.getRenderX(),player.getRenderY());
     }
 
+
     public void keyPressed(int k){
         if(k == KeyEvent.VK_RIGHT){
             player.setDirection(player.RIGHT);
-//            player.step(2,0);
             player.setVelX(1);
+            return;
         }
-        if(k == KeyEvent.VK_LEFT){
+        else if(k == KeyEvent.VK_LEFT){
             player.setDirection(player.LEFT);
             player.setVelX(-1);
-//            player.step(-2,0);
+            return;
         }
-        if(k == KeyEvent.VK_DOWN){
-//            player.step(0,2);
+        else if(k == KeyEvent.VK_DOWN){
+            player.setDirection(player.DOWN);
+            player.setVelY(1);
+            return;
         }
-        if(k == KeyEvent.VK_UP){
-//            player.step(0,-2);
-        }if(k == KeyEvent.VK_SPACE){
-            player.setJumping(true);
-            player.setVelY(-12);
+        else if(k == KeyEvent.VK_UP){
+            player.setDirection(player.UP);
+            player.setVelY(-1);
+            return;
         }
     }
-
     public void keyReleased(int k){
         if(k == KeyEvent.VK_UP){
-
+            player.setDirection(player.IDLE);
+            player.setVelY(0);
         }
-        if(k == KeyEvent.VK_DOWN){
-
+        else if(k == KeyEvent.VK_DOWN){
+            player.setDirection(player.IDLE);
+            player.setVelY(0);
         }
-        if(k == KeyEvent.VK_RIGHT){
+        else if(k == KeyEvent.VK_RIGHT){
             player.setVelX(0);
             player.setDirection(player.IDLE);
         }
-        if(k == KeyEvent.VK_LEFT){
+        else if(k == KeyEvent.VK_LEFT){
             player.setVelX(0);
             player.setDirection(player.IDLE);
         }
@@ -97,11 +100,11 @@ public class LevelState extends GameState {
         int direction = player.getCurrentDirection();
 
         /**wether player is centered on map*/
-//        if(direction == player.UP || direction == player.DOWN){
-//            if(playerOnScreenY == screen.getScreenMiddleY() + newY)
-//                isCentered = true;
-//        }
-//        else
+        if(direction == player.UP || direction == player.DOWN){
+            if(playerOnScreenY == screen.getScreenMiddleY() + newY)
+                isCentered = true;
+        }
+        else
         if(direction == player.RIGHT || direction == player.LEFT){
             if(playerOnScreenX == screen.getScreenMiddleX() + newX)
                 isCentered = true;

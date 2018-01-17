@@ -15,8 +15,13 @@ public class MovingEntity extends Entity{
     public int IDLE  = 4;
     public int RIGHT = 0;
     public int LEFT  = 1;
+    public int UP;
+    public int DOWN;
     public int JUMPING  = 5;
     public int FALLING  = 6;
+
+    protected boolean isSwimming = false;
+
 
     protected int currentDirection = -1;
     protected int currentFrame = 0;
@@ -28,9 +33,6 @@ public class MovingEntity extends Entity{
     protected int rightDownY;
 
     protected boolean isMoving = false;
-    protected boolean isOnGround;
-    protected boolean jumping;
-    protected boolean falling;
 
     protected boolean facingRight = false;
     protected boolean facingLeft = false;
@@ -50,8 +52,6 @@ public class MovingEntity extends Entity{
 
     public MovingEntity(Screen screen,Map map,int x, int y, int width, int height, int cX, int cY, int cWidth, int cHeight){
         super(screen,map,x,y,width,height,cX,cY,cWidth,cHeight);
-        isOnGround = false;
-        jumping = false;
     }
 
     public MovingEntity(Screen screen,Map map,Rectangle render, Rectangle collision){
@@ -67,9 +67,8 @@ public class MovingEntity extends Entity{
     }
 
     protected void move(double delta){
-//            delta /= 2;
             this.currentVelX = MovingEntity.approach(velX,currentVelX,delta);
-
+            this.currentVelY = MovingEntity.approach(velY,currentVelY,delta);
                 collisionOccurs(cX + this.currentVelX * delta,cY);
                 if(topLeft || bottomLeft){
                     System.out.println("left ");
@@ -83,21 +82,23 @@ public class MovingEntity extends Entity{
                 collisionOccurs(cX,cY + this.velY * delta);
                 if(bottomLeft || bottomRight){
                     System.out.println("bottom ");
-                    this.velY = 0;
-                    setJumping(false);
-                    setIsOnGround(true);
+                    this.currentVelY = 0;
                 }else if(topLeft || topRight){
                     System.out.println("top ");
-                    this.velY = 0;
+                    this.currentVelY = 0;
                 }
-                System.out.println("falling: " + falling + " jumping: " + jumping);
                 this.rX += this.currentVelX * delta;
-                this.rY += this.velY *(delta/2);
+                this.rY += this.currentVelY *delta;
                 this.cY = rY;
                 this.cX = rX+1;
 
             this.currentVelX += LevelState.FRICTION*delta;
-            this.velY += LevelState.GRAVITY*delta;
+            this.currentVelY += LevelState.FRICTION*delta;
+
+            if(this.map.getTile(((int)this.cX + this.cWidth/2)>>Game.TILE_BYTE_SIZE,((int)this.cY + this.cHeight/2)>>Game.TILE_BYTE_SIZE).getType() == Tile.SWIMMABLE)
+                this.isSwimming = true;
+            else
+                this.isSwimming = false;
 
             if(this.rY < 0)
                 this.rY = 0;
@@ -115,24 +116,7 @@ public class MovingEntity extends Entity{
         animation.setCurrentAnimation(currentDirection);
     }
 
-    /** checks collision and if none occured we make step
-     * */
-
-    public void step(int x,int y){
-//        calculateCorners(x,y);
-//        if(!collisionOccurs(x,y)) {
-//            this.rX = (this.rX + x);
-//            this.rY = (this.rY + y);
-//        }
-    }
-
     //TODO: check wether all is needed
-//    protected void calculateCorners(double x,double y){
-//        leftUpX = (int)(this.rX + x);
-//        rightUpX = (int)(this.rX + x + cWidth);
-//        rightUpY = (int)(this.rY + y);
-//        rightDownY = (int)(this.rY + y + cHeight);
-//     }
         protected void calculateCorners(double x,double y){
             leftUpX = (int)(x);
             rightUpX = (int)(x + cWidth);
@@ -161,16 +145,6 @@ public class MovingEntity extends Entity{
         int downTileIndex = entityDown >> Game.TILE_BYTE_SIZE;
         int topTileIndex = entityTop >> Game.TILE_BYTE_SIZE;
 
-        /** loop checks if collision occurs in tiles around our object*/
-        boolean collisionOccured = false;
-//        for(int i = topTileIndex;i <= downTileIndex;i++){
-//            for(int j = leftTileIndex; j <= rightTileIndex;j++){
-//                int type = map.getTile(j,i).getType();
-//                if(type == Tile.VOID || type == Tile.BLOCKED){
-//                    collisionOccured = true;
-//                }
-//            }
-//        }
         topLeft     = map.getTile(leftTileIndex,topTileIndex).getType()   == Tile.BLOCKED || map.getTile(leftTileIndex,topTileIndex).getType()   == Tile.VOID;
         topRight    = map.getTile(rightTileIndex,topTileIndex).getType()  == Tile.BLOCKED || map.getTile(rightTileIndex,topTileIndex).getType()  == Tile.BLOCKED;
         bottomLeft  = map.getTile(leftTileIndex,downTileIndex).getType()  == Tile.BLOCKED || map.getTile(leftTileIndex,downTileIndex).getType()  == Tile.BLOCKED;
@@ -189,9 +163,6 @@ public class MovingEntity extends Entity{
         return this.facingLeft;
     }
 
-    public boolean isJumping(){
-        return this.jumping;
-    }
 
     public boolean isIdle(){
         return this.idle;
@@ -213,20 +184,12 @@ public class MovingEntity extends Entity{
         return this.currentVelY;
     }
 
-    public boolean getIsOnGround(){return this.isOnGround;}
-
-    public boolean getFalling(){return this.falling;}
-
     public void setFacingRight(boolean b){
         this.facingRight = b;
     }
 
     public void setFacingLeft(boolean b){
         this.facingLeft = b;
-    }
-
-    public void setJumping(boolean b){
-        this.jumping = b;
     }
 
     public void setIdle(boolean b){
@@ -240,12 +203,6 @@ public class MovingEntity extends Entity{
     public void setVelY(double velY){
         this.velY = velY;
     }
-
-    public void setIsOnGround(boolean b){this.isOnGround = b;}
-
-    public void setFalling(boolean b){this.falling = b;}
-
-
     public void setCurrentVelX(double velx){
         this.currentVelX = velx;
     }
@@ -266,5 +223,7 @@ public class MovingEntity extends Entity{
 
         return goal;
     }
+
+    public boolean isSwimming(){ return this.isSwimming; }
 
 }

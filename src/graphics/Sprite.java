@@ -86,21 +86,15 @@ public class Sprite {
      * @param c Color of the letter
      * **/
     public void drawSprite(Screen screen, int x, int y, Color c){
-
-        int[] scPixels = screen.getPixels();
         for(int i = 0; i < this.width;i++){
             for(int j = 0; j < this.height;j++){
                 int currentPos = j+i*this.width;
-                if(pixels[currentPos] == Font.ALPHA_COLOR.getRGB())
-                    continue;
-                if(pixels[currentPos] == Color.black.getRGB()){
-                    scPixels[(x+j)+(i+y)*screen.getWidth()] = c.getRGB();
-                }
+                if(pixels[currentPos] == Color.black.getRGB())
+                    screen.setPixel((x+j),(i+y),c.getRGB());
                 else
-                    scPixels[(x+j)+(i+y)*screen.getWidth()] = this.pixels[currentPos];
+                    screen.setPixel((x+j),(i+y),this.pixels[currentPos]);
             }
         }
-        screen.setPixels(scPixels);
     }
 
     /**

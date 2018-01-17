@@ -17,6 +17,8 @@ public class SpriteSheet {
 //    public static final SpriteSheet TILE_MAP_SPRITESHEET = new SpriteSheet("/tileSets/tileSet.png",16,16,new int[]{2});
     public static final SpriteSheet TILE_MAP_SPRITESHEET2 = new SpriteSheet("/tileSets/SpriteSheet.png",16,16,new int[]{3,3});
     public static final SpriteSheet PLAYER_SPRITESHEET = new SpriteSheet("/tileSets/gandalfman.png",16,16,new int[]{3,3,2,3,2,3});
+    public static final SpriteSheet PLAYER1_SPRITESHEET = new SpriteSheet("/tileSets/player1.png",16,16,new int[]{2,2,2,2,2,2,2,2,2,2});
+
     private int tileWidth;
     private int tileHeight;
 

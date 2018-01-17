@@ -155,7 +155,7 @@ public class Font {
     }
 
     public SpriteSheet getSpriteSheet(){
-        return this.getSpriteSheet();
+        return this.font;
     }
 
     public Sprite getCharacters(int i){
@@ -173,4 +173,9 @@ public class Font {
     public Color getColor(){
         return this.color;
     }
+
+    public int getWidth(){ return this.width; }
+    public int getHeight() { return this.height; }
+    public Sprite getCharAtIndex(int index) { return this.chars[index]; }
+
 }

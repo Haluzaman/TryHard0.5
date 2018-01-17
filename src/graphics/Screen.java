@@ -28,6 +28,10 @@ public class Screen {
 
     private int middleX;
     private int middleY;
+
+    private Font font;
+    private Color fontColor = Color.YELLOW;
+
     /**
      * @param width
      * @param height
@@ -105,29 +109,25 @@ public class Screen {
     /**
      * Draws resized string
      * @param text text to be rendered
-     * @param font font for the text
      * @param x X-coordinate for drawing
      * @param y Y-coordinate for drawing
      * @param Xoffset offset between the letters in string
      * @param width Width of the resized letter
      * @param height Height of the resized letter
      * */
-    public void renderString(String text,Font font,int x,int y,int Xoffset, int width, int height){
-        Sprite[] chars = font.getCharacters();
-        String charIndex = font.getCharIndex();
+    public void renderString(String text,int x,int y,int Xoffset, int width, int height){
         int yoffset = 0;
         int firstX = x;
         int firstY = y;
-        int w = chars[0].getWidth();
-        int h = chars[0].getHeight();
-        Color color = font.getColor();
+        int charWidth = this.font.getWidth();
+        int charHeight = this.font.getHeight();
         for(int k = 0; k < text.length();k++) {
             if(text.charAt(k) == '\n') {
                 yoffset++;
                 x=firstX;
             }
             if(text.charAt(k) == ' '){
-                x+=width + Xoffset;
+                x+=charWidth + Xoffset;
                 continue;
             }
             else {
@@ -136,11 +136,10 @@ public class Screen {
                     y+=3;
                 else
                     y = firstY;
-                int[] spr = Graphics.scaleImage(chars[charIndex.indexOf(currentChar)].getPixels(),w,h,width,height);
-                renderSprite(spr,x, y,width,height,color);
-                x += width + Xoffset;
+                renderSprite(this.font.getCharAtIndex(this.font.getCharIndex().indexOf(currentChar)),x,y,this.fontColor);
+                x += charWidth + Xoffset;
             }
-            y+=h*yoffset;
+            y += charHeight*yoffset;
         }
     }
 
@@ -152,19 +151,38 @@ public class Screen {
      * @param y Y- coordinate where to start rendering
      * */
     public void renderSprite(Sprite sprite, int x, int y){
-        int[] pix = sprite.getPixels();
-        int width = sprite.getWidth();
-        int height = sprite.getHeight();
-        for(int i = 0; i < height;i++){
-            int yy = i + y;
-            for(int j = 0; j < width;j++){
-                int currentPosition = j+i*width;
-                int xx = j+x;
-                if(xx >= this.width || xx < 0 || yy >= this.height || yy < 0)
+        int[] ImgPixels = sprite.getPixels();
+        int newWidth = sprite.getWidth();
+        int newHeight = sprite.getHeight();
+
+        //we don t have to draw anything!
+        if(x < 0 || x > this.width || y < 0 || y > this.height)
+            return;
+
+        //now if we are drawing outside canvas
+        if(x < 0)
+            x -= x;
+
+        if(y < 0)
+            y -= y;
+
+        //optimisation for for loop
+        if(newWidth + x >= this.width) {
+            newWidth = this.width - x;
+        }
+
+        if(newHeight + y >= this.height){
+            newHeight = this.height - y;
+        }
+
+        for(int i = 0; i < newHeight;i++){
+            for(int j = 0; j < newWidth;j++){
+                int currentPosition = j+i*newWidth;
+
+                if(isAlpha(ImgPixels[currentPosition]))
                     continue;
-                if(pix[currentPosition] == Font.ALPHA_COLOR.getRGB())
-                    continue;
-                this.pixels[xx+yy*this.width] = pix[currentPosition];
+
+                this.pixels[j+i*this.width] = ImgPixels[currentPosition];
             }
         }
     }
@@ -181,10 +199,9 @@ public class Screen {
             for(int j = 0; j < width;j++){
                 int currentPosition = j+i*width;
                 int xx = j+x;
+//                setPixel(xx,yy,pix[currentPosition]);
                 if(xx >= this.width || xx < 0 || yy >= this.height || yy < 0)
                     continue;
-//                if((x+j)+(i+y)*this.width > ((this.width + i+y)*this.width))
-//                    break;
                 if(pix[currentPosition] == Font.ALPHA_COLOR.getRGB())
                     continue;
                 this.pixels[xx+yy*this.width] = pix[currentPosition];
@@ -202,17 +219,35 @@ public class Screen {
      * */
     public void renderSprite(Sprite sprite, int x, int y,Color c){
         int[] pix = sprite.getPixels();
-        int width = sprite.getWidth();
-        int height = sprite.getHeight();
-        for(int i = 0; i < height;i++){
-            for(int j = 0; j < width;j++){
-                int currentPosition = j+i*width;
-                if(pix[currentPosition] == Font.ALPHA_COLOR.getRGB())
+        int newWidth = sprite.getWidth();
+        int newHeight = sprite.getHeight();
+
+        //we don t have to draw anything!
+        if(x < 0 || x > this.width || y < 0 || y > this.height)
+            return;
+
+        //now if we are drawing outside canvas
+        if(x < 0)
+            x -= x;
+
+        if(y < 0)
+            y -= y;
+
+        if(newWidth + x >= this.width) {
+            newWidth = this.width - x;
+        }
+
+        if(newHeight + y >= this.height){
+            newHeight = this.height - y;
+        }
+
+        for(int i = 0; i < newHeight;i++){
+            for(int j = 0; j < newWidth;j++){
+                int currentPosition = j+i*newWidth;
+                if(isAlpha(pix[currentPosition]))
                     continue;
                 if(pix[currentPosition] == Color.BLACK.getRGB())
-                    this.pixels[(x + j) + (i + y) * this.width] = c.getRGB();
-                else
-                    this.pixels[(x+j)+(i+y)*this.width] = pix[currentPosition];
+                  this.pixels[(x + j) + (i + y) * this.width] = this.fontColor.getRGB();
             }
         }
     }
@@ -379,5 +414,30 @@ public class Screen {
 
     public Dimension getBounds(){
         return this.bounds;
+    }
+
+    public void setPixel(int x, int y, int value){
+        if(x < 0 || x >= this.width || y < 0 || this.y >= this.height)
+            return;
+        if(isAlpha(value))
+            return;
+
+        this.pixels[x + y * this.width] = value;
+    }
+
+    public boolean isAlpha(int pixelValue){
+        if(((pixelValue >> 24) & 0xff) == 0)
+            return true;
+
+        return false;
+    }
+
+
+    public void setFont(Font font){
+        this.font = font;
+    }
+
+    public void setFontColor(Color fontColor){
+        this.fontColor = fontColor;
     }
 }
