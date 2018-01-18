@@ -87,6 +87,7 @@ public class MovingEntity extends Entity{
                     System.out.println("top ");
                     this.currentVelY = 0;
                 }
+
                 this.rX += this.currentVelX * delta;
                 this.rY += this.currentVelY *delta;
                 this.cY = rY;
@@ -100,8 +101,8 @@ public class MovingEntity extends Entity{
             else
                 this.isSwimming = false;
 
-            if(this.rY < 0)
-                this.rY = 0;
+//            if(this.rY < 0)
+//                this.rY = 0;
     }
 
     public boolean isMoving(){

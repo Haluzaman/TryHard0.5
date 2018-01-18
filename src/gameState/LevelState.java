@@ -10,7 +10,6 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import graphics.*;
 
-import static com.oracle.deploy.update.UpdateCheck.UpdateCheckState.IDLE;
 
 /**
  * Created by bubof on 09.07.2017.

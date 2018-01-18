@@ -176,13 +176,14 @@ public class Screen {
         }
 
         for(int i = 0; i < newHeight;i++){
+            int yy = i + y;
             for(int j = 0; j < newWidth;j++){
                 int currentPosition = j+i*newWidth;
-
+                int xx = j+x;
                 if(isAlpha(ImgPixels[currentPosition]))
                     continue;
 
-                this.pixels[j+i*this.width] = ImgPixels[currentPosition];
+                this.pixels[xx+yy*this.width] = ImgPixels[currentPosition];
             }
         }
     }
